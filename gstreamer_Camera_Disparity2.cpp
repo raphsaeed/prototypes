@@ -1,4 +1,5 @@
 #include <gst/gst.h>
+//g++ -o disparity gstreamer_Camera_Disparity2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 
 int main() {
   // Initialize GStreamer.
