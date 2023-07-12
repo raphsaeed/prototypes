@@ -1,4 +1,4 @@
-#include <gst/gst.h>
+#include </usr/include/gstreamer-1.0/gst/gst.h>
 
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *source, *sink;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Modify the source's properties */
-    g_object_set(source, "device", "/dev/video0", NULL);
+    g_object_set(source, "device", "/dev/video2", NULL);
 
     /* Start playing */
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);

@@ -1,4 +1,4 @@
-#include <gst/gst.h>
+#include </usr/include/gstreamer-1.0/gst/gst.h>
 //g++ -o disparity gstreamer_Camera_Disparity2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 
 int main() {
@@ -14,7 +14,7 @@ int main() {
 
   // Set the device names for the video sources.
   g_object_set(source1, "device", "/dev/video0", NULL);
-  g_object_set(source2, "device", "/dev/video1", NULL);
+  g_object_set(source2, "device", "/dev/video2", NULL);
 
   // Create queues.
   GstElement *queue1 = gst_element_factory_make("queue", "queue1");

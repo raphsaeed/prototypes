@@ -1,4 +1,4 @@
-#include <gst/gst.h>
+#include </usr/include/gstreamer-1.0/gst/gst.h>
 
 int main() {
   // Initialize GStreamer.
@@ -13,7 +13,7 @@ int main() {
 
   // Set the device names for the video sources.
   g_object_set(source1, "device", "/dev/video0", NULL);
-  g_object_set(source2, "device", "/dev/video1", NULL);
+  g_object_set(source2, "device", "/dev/video2", NULL);
 
   // Create a muxer to combine the video streams.
   GstElement *muxer = gst_element_factory_create("flvmux", "muxer");

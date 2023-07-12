@@ -1,5 +1,5 @@
-#include <gst/gst.h>
-#include <gst/video/video.h>
+#include </usr/include/gstreamer-1.0/gst/gst.h>
+#include </usr/include/gstreamer-1.0/gst/video/video.h>
 
 int main() {
   // Create a pipeline.
@@ -12,7 +12,7 @@ int main() {
 
   // Set the video source properties.
   gst_element_set_property(source1, "device", "/dev/video0");
-  gst_element_set_property(source2, "device", "/dev/video1");
+  gst_element_set_property(source2, "device", "/dev/video2");
 
   // Create the disparity generator.
   GstElement *disparity = gst_element_factory_create("disparity", "disparity");
