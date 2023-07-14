@@ -1,5 +1,7 @@
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 
+//g++ -o my_program my_program.cpp `pkg-config --cflags --libs gstreamer-1.0`
+
 int main(int argc, char *argv[]) {
     // Initialize GStreamer.
     gst_init(&argc, &argv);
