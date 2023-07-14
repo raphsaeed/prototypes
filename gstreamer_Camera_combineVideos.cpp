@@ -2,6 +2,7 @@
 
 //g++ -o my_program my_program.cpp `pkg-config --cflags --libs gstreamer-1.0`
 
+
 int main(int argc, char *argv[]) {
     // Initialize GStreamer.
     gst_init(&argc, &argv);
@@ -17,6 +18,10 @@ int main(int argc, char *argv[]) {
     g_object_set(source1, "device", "/dev/video0", NULL);
     g_object_set(source2, "device", "/dev/video2", NULL);
 
+    // Create video converters
+    GstElement *convert1 = gst_element_factory_make("videoconvert", "convert1");
+    GstElement *convert2 = gst_element_factory_make("videoconvert", "convert2");
+
     // Create a muxer to combine the video streams.
     GstElement *muxer = gst_element_factory_make("flvmux", "muxer");
 
@@ -27,10 +32,10 @@ int main(int argc, char *argv[]) {
     g_object_set(sink, "location", "output.flv", NULL);
 
     // Add the elements to the pipeline.
-    gst_bin_add_many(GST_BIN(pipeline), source1, source2, muxer, sink, NULL);
+    gst_bin_add_many(GST_BIN(pipeline), source1, convert1, source2, convert2, muxer, sink, NULL);
 
     // Link the elements together.
-    if (!gst_element_link_many(source1, muxer, NULL) || !gst_element_link_many(source2, muxer, NULL) || !gst_element_link(muxer, sink)) {
+    if (!gst_element_link_many(source1, convert1, muxer, NULL) || !gst_element_link_many(source2, convert2, muxer, NULL) || !gst_element_link(muxer, sink)) {
         g_warning("Failed to link elements!");
     }
 
@@ -50,3 +55,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
