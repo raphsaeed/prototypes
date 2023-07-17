@@ -13,7 +13,8 @@ const std::string SAVE_FOLDER = "/path/to/save/folder/";
 // Callback function to handle new video frames
 static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
 {
-    static int count = 0;
+    static int count1 = 0;
+    static int count2 = 0;
 
     GstSample* sample;
     g_signal_emit_by_name(pipeline, "pull-sample", &sample);
@@ -24,8 +25,18 @@ static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
         GstMapInfo map;
         gst_buffer_map(buffer, &map, GST_MAP_READ);
 
-        std::string filename = SAVE_FOLDER + "image_" + std::to_string(count) + ".jpeg";
-        
+        std::string filename;
+        if (pipeline == pipeline1)
+        {
+            filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
+            count1++;
+        }
+        else if (pipeline == pipeline2)
+        {
+            filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
+            count2++;
+        }
+
         // Save the image to file
         FILE* file = fopen(filename.c_str(), "wb");
         if (file)
@@ -33,8 +44,6 @@ static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
             fwrite(map.data, 1, map.size, file);
             fclose(file);
         }
-
-        count++;
 
         gst_buffer_unmap(buffer, &map);
         gst_sample_unref(sample);
@@ -49,7 +58,7 @@ int main(int argc, char* argv[])
     
     // Create GStreamer elements
     GstElement* pipeline1 = gst_parse_launch("v4l2src device=/dev/video0 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink1", NULL);
-    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video2 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
+    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video1 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
     
     // Set callback function for new video frames
     GstElement* appsink1 = gst_bin_get_by_name(GST_BIN(pipeline1), "appsink1");
@@ -85,3 +94,4 @@ int main(int argc, char* argv[])
     
     return 0;
 }
+
