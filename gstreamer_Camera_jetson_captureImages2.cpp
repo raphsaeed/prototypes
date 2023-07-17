@@ -1,17 +1,19 @@
 //< g++ -o capture_images gstreamer_Camera_jetson_captureImages.cpp $(pkg-config --cflags --libs gstreamer-1.0)
-#include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include </usr/include/gstreamer-1.0/gst/gst.h>
+#include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
 #include <string>
+#include <unistd.h>  // for sleep
 
 // Number of images to capture from each camera
 const int NUM_IMAGES = 10;
 
-// Delay between images in microseconds
-const int DELAY_US = 3000000;
-
 // Folder to save the captured images
 const std::string SAVE_FOLDER = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/";
+
+GstElement *sink1;
+GstElement *sink2;
+GMainLoop *loop;
 
 // Callback function to handle new video frames
 GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
@@ -31,9 +33,11 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
         if (sink == sink1) {
             filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
             count1++;
+            sleep(3);  // Add a delay of 3 seconds between each image capture
         } else if (sink == sink2) {
             filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
             count2++;
+            sleep(3);  // Add a delay of 3 seconds between each image capture
         }
 
         // Save the image to file
@@ -50,16 +54,13 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
     // Stop capturing after NUM_IMAGES
     if (count1 >= NUM_IMAGES && count2 >= NUM_IMAGES) {
         g_main_loop_quit(loop);
-    } else {
-        // Delay between images
-        g_usleep(DELAY_US);
     }
     
     return GST_FLOW_OK;
 }
 
 int main(int argc, char *argv[]) {
-    GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
+    GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2;
 
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Run the main loop */
-    GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+    loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
 
     /* Free resources */
