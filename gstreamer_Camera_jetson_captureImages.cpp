@@ -2,22 +2,20 @@
 #include <stdio.h>
 #include <string>
 
-//> g++ -o capture_images capture_images.cpp $(pkg-config --cflags --libs gstreamer-1.0)
-
 // Number of images to capture from each camera
 const int NUM_IMAGES = 10;
 
 // Folder to save the captured images
 const std::string SAVE_FOLDER = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/";
 
-// Callback function to handle new video frames
-static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
-{
-    static int count1 = 0;
-    static int count2 = 0;
+static int count1 = 0;
+static int count2 = 0;
 
+// Callback function to handle new video frames
+static GstFlowReturn new_sample_cb(GstElement* appsink, gpointer user_data)
+{
     GstSample* sample;
-    g_signal_emit_by_name(pipeline, "pull-sample", &sample);
+    g_signal_emit_by_name(appsink, "pull-sample", &sample);
     
     if (sample)
     {
@@ -26,15 +24,29 @@ static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
         gst_buffer_map(buffer, &map, GST_MAP_READ);
 
         std::string filename;
-        if (pipeline == pipeline1)
+        if (appsink == user_data)
         {
-            filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
-            count1++;
+            if(count1 < NUM_IMAGES)
+            {
+                filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
+                count1++;
+            }
+            else
+            {
+                return GST_FLOW_OK;
+            }
         }
-        else if (pipeline == pipeline2)
+        else
         {
-            filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
-            count2++;
+            if(count2 < NUM_IMAGES)
+            {
+                filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
+                count2++;
+            }
+            else
+            {
+                return GST_FLOW_OK;
+            }
         }
 
         // Save the image to file
@@ -57,17 +69,22 @@ int main(int argc, char* argv[])
     gst_init(&argc, &argv);
     
     // Create GStreamer elements
-    GstElement* pipeline1 = gst_parse_launch("v4l2src device=/dev/video0 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink1", NULL);
-    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video1 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
+    //GstElement* pipeline1 = gst_parse_launch("v4l2src device=/dev/video0 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink1", NULL);
+    //GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video2 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
+
+    // Create GStreamer elements
+    GstElement* pipeline1 = gst_parse_launch("v4l2src device=/dev/video2 ! videoconvert ! jpegenc ! appsink name=appsink1", NULL);
+    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video0 ! videoconvert ! jpegenc ! appsink name=appsink2", NULL);
+
     
     // Set callback function for new video frames
     GstElement* appsink1 = gst_bin_get_by_name(GST_BIN(pipeline1), "appsink1");
     g_object_set(appsink1, "emit-signals", TRUE, NULL);
-    g_signal_connect(appsink1, "new-sample", G_CALLBACK(new_sample_cb), NULL);
+    g_signal_connect(appsink1, "new-sample", G_CALLBACK(new_sample_cb), appsink1);
     
     GstElement* appsink2 = gst_bin_get_by_name(GST_BIN(pipeline2), "appsink2");
     g_object_set(appsink2, "emit-signals", TRUE, NULL);
-    g_signal_connect(appsink2, "new-sample", G_CALLBACK(new_sample_cb), NULL);
+    g_signal_connect(appsink2, "new-sample", G_CALLBACK(new_sample_cb), appsink2);
     
     // Start the pipelines
     gst_element_set_state(pipeline1, GST_STATE_PLAYING);
@@ -94,5 +111,3 @@ int main(int argc, char* argv[])
     
     return 0;
 }
-
-
