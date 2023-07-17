@@ -6,7 +6,7 @@
 #include <unistd.h>  // for sleep
 
 // Number of images to capture from each camera
-const int NUM_IMAGES = 10;
+const int NUM_IMAGES = 20;
 
 // Folder to save the captured images
 const std::string SAVE_FOLDER = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/";
@@ -34,7 +34,6 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
             filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
             count1++;
             sleep(3);  // Add a delay of 3 seconds between each image capture
-            g_print("get ready for Next image...\n");
         } else if (sink == sink2) {
             filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
             count2++;
@@ -110,7 +109,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    sleep(5);  // Add a delay of 5 seconds Let camera focus
+    sleep(15);  // Add a delay of 15 seconds Let camera focus
 
     /* Run the main loop */
     loop = g_main_loop_new(NULL, FALSE);
