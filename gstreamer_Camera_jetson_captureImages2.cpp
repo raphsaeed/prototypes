@@ -1,4 +1,4 @@
-//< g++ -o capture_images gstreamer_Camera_jetson_captureImages.cpp $(pkg-config --cflags --libs gstreamer-1.0)
+//< g++ -o capture_images gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
@@ -34,10 +34,12 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
             filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
             count1++;
             sleep(3);  // Add a delay of 3 seconds between each image capture
+            g_print("get ready for Next image...\n");
         } else if (sink == sink2) {
             filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
             count2++;
             sleep(3);  // Add a delay of 3 seconds between each image capture
+            g_print("get ready for Next image...\n");
         }
 
         // Save the image to file
@@ -107,6 +109,8 @@ int main(int argc, char *argv[]) {
         gst_object_unref(pipeline);
         return -1;
     }
+
+    sleep(5);  // Add a delay of 5 seconds Let camera focus
 
     /* Run the main loop */
     loop = g_main_loop_new(NULL, FALSE);
