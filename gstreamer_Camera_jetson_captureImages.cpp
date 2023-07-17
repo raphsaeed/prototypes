@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     
     // Create GStreamer elements
     GstElement* pipeline1 = gst_parse_launch("v4l2src device=/dev/video0 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink1", NULL);
-    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video1 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
+    GstElement* pipeline2 = gst_parse_launch("v4l2src device=/dev/video2 ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink2", NULL);
     
     // Set callback function for new video frames
     GstElement* appsink1 = gst_bin_get_by_name(GST_BIN(pipeline1), "appsink1");
