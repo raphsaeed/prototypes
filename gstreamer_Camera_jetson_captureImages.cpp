@@ -8,7 +8,7 @@
 const int NUM_IMAGES = 10;
 
 // Folder to save the captured images
-const std::string SAVE_FOLDER = "/path/to/save/folder/";
+const std::string SAVE_FOLDER = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/";
 
 // Callback function to handle new video frames
 static GstFlowReturn new_sample_cb(GstElement* pipeline, gpointer user_data)
