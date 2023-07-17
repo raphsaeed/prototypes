@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     int count1 = 0;
     int count2 = 0;
     
-    while (count1 < NUM_IMAGES || count2 < NUM_IMAGES)
+    while (count1 < NUM_IMAGES && count2 < NUM_IMAGES)
     {
         GstMessage* msg = gst_bus_timed_pop_filtered(gst_element_get_bus(pipeline1), GST_CLOCK_TIME_NONE,
                                                      GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
