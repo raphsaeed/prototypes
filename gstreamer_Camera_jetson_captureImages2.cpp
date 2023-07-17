@@ -1,3 +1,4 @@
+//< g++ -o capture_images gstreamer_Camera_jetson_captureImages.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include <stdio.h>
