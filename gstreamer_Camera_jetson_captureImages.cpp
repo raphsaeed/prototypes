@@ -33,12 +33,12 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
         if (sink == sink1) {
             filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
             count1++;
-            sleep(3);  // Add a delay of 3 seconds between each image capture
+            //sleep(3);  // Add a delay of 3 seconds between each image capture
         } else if (sink == sink2) {
             filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
             count2++;
-            sleep(3);  // Add a delay of 3 seconds between each image capture
-            g_print("get ready for Next image...\n");
+            //sleep(3);  // Add a delay of 3 seconds between each image capture
+            //g_print("get ready for Next image...\n");
         }
 
         // Save the image to file
@@ -46,6 +46,9 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
         if (file) {
             fwrite(map.data, 1, map.size, file);
             fclose(file);
+        } else {
+            printf("Failed to open file: %s\n", filename.c_str());
+            return GST_FLOW_ERROR;
         }
 
         gst_buffer_unmap(buffer, &map);
@@ -55,6 +58,9 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
     // Stop capturing after NUM_IMAGES
     if (count1 >= NUM_IMAGES && count2 >= NUM_IMAGES) {
         g_main_loop_quit(loop);
+    } else {
+        printf("Get ready for the next picture!\n");
+        sleep(3);  // Add a delay of 3 seconds between each image capture
     }
     
     return GST_FLOW_OK;
