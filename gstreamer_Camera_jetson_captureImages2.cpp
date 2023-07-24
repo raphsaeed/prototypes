@@ -1,4 +1,4 @@
-//< g++ -o capture_images gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
+//< g++ -o capture_images2 gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
@@ -6,7 +6,7 @@
 #include <unistd.h>  // for sleep
 
 // Number of images to capture from each camera
-const int NUM_IMAGES = 10;
+const int NUM_IMAGES = 5;
 
 // Folder to save the captured images
 const std::string SAVE_FOLDER = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/";
@@ -33,15 +33,13 @@ GstFlowReturn new_sample_cb(GstElement* sink, gpointer user_data)
         if (sink == sink1) {
             filename = SAVE_FOLDER + "image1_" + std::to_string(count1) + ".jpeg";
             count1++;
-            sleep(3);  // Add a delay of 3 seconds between each image capture
-            g_print("get ready for Next image...\n");
         } else if (sink == sink2) {
             filename = SAVE_FOLDER + "image2_" + std::to_string(count2) + ".jpeg";
             count2++;
-            sleep(3);  // Add a delay of 3 seconds between each image capture
-            g_print("get ready for Next image...\n");
         }
-
+        sleep(3);
+        g_print("2----get ready for Next image...\n");
+        
         // Save the image to file
         FILE* file = fopen(filename.c_str(), "wb");
         if (file) {
