@@ -5,12 +5,6 @@
 #include <string>
 #include <unistd.h>  // for sleep
 
-#include </usr/include/gstreamer-1.0/gst/gst.h>
-#include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
-#include <stdio.h>
-#include <string>
-#include <unistd.h>
-
 // Number of images to capture from each camera
 const int NUM_IMAGES = 5;
 
