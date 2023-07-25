@@ -1,5 +1,4 @@
 //< g++ -o capture_images2 gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
-// g++ -o capture_images2 gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
@@ -8,7 +7,7 @@
 #include <filesystem>  // for directory creation
 
 // Number of images to capture from each camera
-const int NUM_IMAGES = 5;
+//const int NUM_IMAGES = 5;
 
 // Folder to save the captured images
 std::filesystem::path cwd = std::filesystem::current_path();
@@ -51,6 +50,17 @@ void capture_image(GstElement* sink, const std::string& prefix, int count)
 }
 
 int main(int argc, char *argv[]) {
+
+    int NUM_IMAGES = 5;
+
+    if (argc != 2) {
+        //printf("Usage: %s <num_images>\n", argv[0]);
+        printf("capturing 5 immages as no input argument entered\n");
+        //return 1;
+    } else {
+        NUM_IMAGES = std::stoi(argv[1]);
+    }
+
     GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
 
     /* Initialize GStreamer */
