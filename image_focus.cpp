@@ -1,13 +1,13 @@
-//> g++ -o focus_check focus_check.cpp $(pkg-config --libs --cflags opencv4)
+//> g++ -o image_focus image_focus.cpp $(pkg-config --libs --cflags opencv4)
 #include </usr/include/opencv4/opencv2/opencv.hpp>
 #include <iostream>
 
-double variance_of_laplacian(const cv2::Mat& src) {
-    cv2::Mat lap;
-    cv2::Laplacian(src, lap, CV_64F);
+double variance_of_laplacian(cv::Mat image) {
+    cv::Mat lap;
+    cv::Laplacian(image, lap, CV_64F);
 
-    cv2::Scalar mu, sigma;
-    cv2::meanStdDev(lap, mu, sigma);
+    cv::Scalar mu, sigma;
+    cv::meanStdDev(lap, mu, sigma);
 
     return sigma.val[0] * sigma.val[0];
 }
@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    cv2::Mat src = cv2::imread(argv[1], cv2::IMREAD_GRAYSCALE);
+    cv::Mat src = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
     if (src.empty()) {
         std::cout << "Could not open or find the image\n";
         return -1;
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
     double fm = variance_of_laplacian(src);
 
-    std::cout << "Focus measure: " << fm << std::endl;
+    std::cout << "Focus measure: " << fm << "\n";
     if (fm < 100.0) { // Threshold is hypothetical and should be determined based on your specific requirements.
         std::cout << "The image is blurry.\n";
     } else {
@@ -35,3 +35,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+

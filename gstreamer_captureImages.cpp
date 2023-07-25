@@ -1,4 +1,4 @@
-//< g++ -o capture_images2 gstreamer_Camera_jetson_captureImages2.cpp $(pkg-config --cflags --libs gstreamer-1.0)
+//< g++ -std=c++17 -o capture_images gstreamer_captureImages.cpp `pkg-config --cflags --libs gstreamer-1.0`
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
@@ -6,22 +6,24 @@
 #include <unistd.h>  // for sleep
 #include <filesystem>  // for directory creation
 
+
 // Number of images to capture from each camera
 //const int NUM_IMAGES = 5;
 
 // Folder to save the captured images
 std::filesystem::path cwd = std::filesystem::current_path();
-std::filesystem::path save_dir = cwd / "images";
+std::filesystem::path save_dir = cwd / "images2";
 
 // Create directories and check if they already existed
-bool directory_existed = std::filesystem::create_directories(save_dir);
+bool directory_was_created = std::filesystem::create_directories(save_dir);
+//printf("capturing 5 immages as no input argument entered\n");
 
-// If the directory already existed, delete all files in it
-if (directory_existed) {
-    for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
-        std::filesystem::remove(file);
-    }
-}
+
+//if (!directory_was_created) {
+//    for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
+//        std::filesystem::remove(file);
+//    }
+//}
 
 std::string SAVE_FOLDER = save_dir.string() + "/";
 
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     if (argc != 2) {
         //printf("Usage: %s <num_images>\n", argv[0]);
-        printf("capturing 5 immages as no input argument entered\n");
+        printf("capturing 5 images as no input argument entered\n");
         //return 1;
     } else {
         NUM_IMAGES = std::stoi(argv[1]);
@@ -116,6 +118,7 @@ int main(int argc, char *argv[]) {
     /* Free resources */
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
+    printf("Capturing image\n");
 
     return 0;
 }
