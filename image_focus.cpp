@@ -1,5 +1,5 @@
 //> g++ -o focus_check focus_check.cpp $(pkg-config --libs --cflags opencv4)
-#include <opencv2/opencv.hpp>
+#include </usr/include/opencv4/opencv2/opencv.hpp>
 #include <iostream>
 
 double variance_of_laplacian(const cv2::Mat& src) {
