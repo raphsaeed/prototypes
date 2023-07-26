@@ -7,17 +7,29 @@
 #include <filesystem>  // for directory creation
 
 
+
+bool setup_directory(std::filesystem::path save_dir) {
+    // Create directories and check if they already existed
+    bool directory_was_created = std::filesystem::create_directories(save_dir);
+
+    if (!directory_was_created) {
+        for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
+            std::filesystem::remove(file);
+        }
+    }
+
+    return directory_was_created;
+}
+
 // Number of images to capture from each camera
 //const int NUM_IMAGES = 5;
 
 // Folder to save the captured images
-std::filesystem::path cwd = std::filesystem::current_path();
-std::filesystem::path save_dir = cwd / "images2";
+//std::filesystem::path cwd = std::filesystem::current_path();
+//std::filesystem::path save_dir = cwd / "images2";
 
 // Create directories and check if they already existed
-bool directory_was_created = std::filesystem::create_directories(save_dir);
-//printf("capturing 5 immages as no input argument entered\n");
-
+//bool directory_was_created = std::filesystem::create_directories(save_dir);
 
 //if (!directory_was_created) {
 //    for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
@@ -61,6 +73,15 @@ int main(int argc, char *argv[]) {
         //return 1;
     } else {
         NUM_IMAGES = std::stoi(argv[1]);
+    }
+
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::filesystem::path save_dir = cwd / "images2";
+
+    bool directory_setup_success = setup_directory(save_dir);
+    if(!directory_setup_success) {
+        printf("Directory setup failed!\n");
+        return -1; // or handle failure in some other way
     }
 
     GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
