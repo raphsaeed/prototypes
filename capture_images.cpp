@@ -1,4 +1,4 @@
-//< g++ -std=c++17 -o capture_images gstreamer_captureImages.cpp `pkg-config --cflags --libs gstreamer-1.0`
+//< g++ -std=c++17 -o capture_images capture_images.cpp `pkg-config --cflags --libs gstreamer-1.0`
 #include </usr/include/gstreamer-1.0/gst/gst.h>
 #include </usr/include/gstreamer-1.0/gst/app/gstappsink.h>
 #include <stdio.h>
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
     std::string SAVE_FOLDER = save_dir.string() + "/";
 
-    GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2, *queue1, *queue2, *video_sink1, *video_sink2;
+    GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
     GstBus *bus;
 
     /* Initialize GStreamer */
@@ -82,10 +82,6 @@ int main(int argc, char *argv[]) {
     jpegenc2 = gst_element_factory_make("jpegenc", "jpegenc2");
     sink1 = gst_element_factory_make("appsink", "sink1");
     sink2 = gst_element_factory_make("appsink", "sink2");
-    queue1 = gst_element_factory_make("queue", "queue1");
-    queue2 = gst_element_factory_make("queue", "queue2");
-    video_sink1 = gst_element_factory_make("autovideosink", "video_sink1");
-    video_sink2 = gst_element_factory_make("autovideosink", "video_sink2");
 
     /* Modify the source's properties */
     g_object_set(source1, "device", "/dev/video0", NULL);
@@ -94,15 +90,15 @@ int main(int argc, char *argv[]) {
     /* Create the empty pipeline */
     pipeline = gst_pipeline_new("test-pipeline");
 
-    if (!pipeline || !source1 || !source2 || !jpegenc1 || !jpegenc2 || !sink1 || !sink2 || !queue1 || !queue2 || !video_sink1 || !video_sink2) {
+    if (!pipeline || !source1 || !source2 || !jpegenc1 || !jpegenc2 || !sink1 || !sink2) {
         g_printerr("Not all elements could be created.\n");
         return -1;
     }
 
     /* Build the pipeline */
-    gst_bin_add_many(GST_BIN(pipeline), source1, jpegenc1, sink1, queue1, video_sink1, source2, jpegenc2, sink2, queue2, video_sink2, NULL);
-    if (gst_element_link_many(source1, queue1, video_sink1, jpegenc1, sink1, NULL) != TRUE ||
-        gst_element_link_many(source2, queue2, video_sink2, jpegenc2, sink2, NULL) != TRUE) {
+    gst_bin_add_many(GST_BIN(pipeline), source1, jpegenc1, sink1, source2, jpegenc2, sink2, NULL);
+    if (gst_element_link_many(source1, jpegenc1, sink1, NULL) != TRUE ||
+        gst_element_link_many(source2, jpegenc2, sink2, NULL) != TRUE) {
         g_printerr("Elements could not be linked.\n");
         gst_object_unref(pipeline);
         return -1;
@@ -110,20 +106,29 @@ int main(int argc, char *argv[]) {
 
     bus = gst_element_get_bus(pipeline);
 
-    /* Start playing */
-    GstStateChangeReturn ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
-    if (ret == GST_STATE_CHANGE_FAILURE) {
-        g_printerr("Unable to set the pipeline to the playing state.\n");
-        gst_object_unref(pipeline);
-        return -1;
-    }
-
     /* Capture NUM_IMAGES from each source */
     for (int i = 0; i < NUM_IMAGES; i++) {
+        /* Start playing */
+        GstStateChangeReturn ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+        if (ret == GST_STATE_CHANGE_FAILURE) {
+            g_printerr("Unable to set the pipeline to the playing state.\n");
+            gst_object_unref(pipeline);
+            return -1;
+        }
+
         printf("Capturing image %d\n", i+1);
         // Pass SAVE_FOLDER as an argument to the function calls
         capture_image(sink1, "Right_", i, SAVE_FOLDER);
         capture_image(sink2, "Left_", i, SAVE_FOLDER);
+
+        GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, GST_MESSAGE_EOS);
+
+        /* Free resources */
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+
+        if(msg != NULL)
+            gst_message_unref(msg);
+
         sleep(3);  // Wait for 3 seconds before capturing the next image
     }
 
@@ -132,4 +137,5 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
 
