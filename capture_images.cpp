@@ -6,25 +6,29 @@
 #include <unistd.h>  // for sleep
 #include <filesystem>  // for directory creation
 
-bool setup_directory(std::filesystem::path save_dir) {  
-    bool directory_was_created = true; 
-    if (std::filesystem::exists(save_dir)) {
-        for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
-            std::filesystem::remove(file);
-        }
-    } else {
-        bool directory_was_created = std::filesystem::create_directories(save_dir);
-        if (directory_was_created) {
-            printf("Directory was created.\n");
-        } else {
-            printf("Failed to create directory.\n");
-        }
-    } 
-    return directory_was_created;
-}
+
+// Number of images to capture from each camera
+//const int NUM_IMAGES = 5;
+
+// Folder to save the captured images
+std::filesystem::path cwd = std::filesystem::current_path();
+std::filesystem::path save_dir = cwd / "images2";
+
+// Create directories and check if they already existed
+bool directory_was_created = std::filesystem::create_directories(save_dir);
+//printf("capturing 5 immages as no input argument entered\n");
+
+
+//if (!directory_was_created) {
+//    for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
+//        std::filesystem::remove(file);
+//    }
+//}
+
+std::string SAVE_FOLDER = save_dir.string() + "/";
 
 // Function to capture and save an image from a sink
-void capture_image(GstElement* sink, const std::string& prefix, int count, const std::string& save_folder)
+void capture_image(GstElement* sink, const std::string& prefix, int count)
 {
     GstSample* sample;
     g_signal_emit_by_name(sink, "pull-sample", &sample);
@@ -34,8 +38,7 @@ void capture_image(GstElement* sink, const std::string& prefix, int count, const
         GstMapInfo map;
         gst_buffer_map(buffer, &map, GST_MAP_READ);
 
-        // Use the passed in save_folder instead of the out-of-scope variable
-        std::string filename = save_folder + prefix + std::to_string(count) + ".jpeg";
+        std::string filename = SAVE_FOLDER + prefix + std::to_string(count) + ".jpeg";
 
         FILE* file = fopen(filename.c_str(), "wb");
         if (file) {
@@ -49,25 +52,16 @@ void capture_image(GstElement* sink, const std::string& prefix, int count, const
 }
 
 int main(int argc, char *argv[]) {
-    
+
     int NUM_IMAGES = 5;
 
     if (argc != 2) {
+        //printf("Usage: %s <num_images>\n", argv[0]);
         printf("capturing 5 images as no input argument entered\n");
+        //return 1;
     } else {
         NUM_IMAGES = std::stoi(argv[1]);
     }
-
-    std::filesystem::path cwd = std::filesystem::current_path();
-    std::filesystem::path save_dir = cwd / "caliberation";
-
-    bool directory_setup_success = setup_directory(save_dir);
-    if(!directory_setup_success) {
-        printf("Directory setup failed!\n");
-        return -1;
-    }
-
-    std::string SAVE_FOLDER = save_dir.string() + "/";
 
     GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
 
@@ -116,9 +110,8 @@ int main(int argc, char *argv[]) {
     /* Capture NUM_IMAGES from each source */
     for (int i = 0; i < NUM_IMAGES; i++) {
         printf("Capturing image %d\n", i+1);
-        // Pass SAVE_FOLDER as an argument to the function calls
-        capture_image(sink1, "Right_", i, SAVE_FOLDER);
-        capture_image(sink2, "Left_", i, SAVE_FOLDER);
+        capture_image(sink1, "Right_", i);
+        capture_image(sink2, "Left_", i);
         sleep(3);  // Wait for 3 seconds before capturing the next image
     }
 
