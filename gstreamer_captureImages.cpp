@@ -45,6 +45,12 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+//if (!directory_was_created) {
+//    for (const auto & file : std::filesystem::directory_iterator(save_dir)) {
+//        std::filesystem::remove(file);
+//    }
+//}
+
     GstElement *pipeline, *source1, *source2, *jpegenc1, *jpegenc2, *sink1, *sink2;
 
     /* Initialize GStreamer */
