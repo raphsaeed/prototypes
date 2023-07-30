@@ -17,18 +17,19 @@ int main(int argc, char** argv)
     }
 
     cv::Mat frame1, frame2;
-    int frameCounter1 = 0, frameCounter2 = 0;
     int imageCounter1 = 0, imageCounter2 = 0;
-    int maxImages = 5; // number of images you want to capture
+    int maxImages = 10; // number of images you want to capture
 
     std::string outputDirectory = "/media/raphs/RaphsORIN/projects/GitHUB/prototypes/images/"; // specify the output directory here
-    
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Create windows to display the videos
     cv::namedWindow("Live Video Stream 1", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("Live Video Stream 2", cv::WINDOW_AUTOSIZE);
-   
+
+    // Get the start time
+    auto start = std::chrono::high_resolution_clock::now();
+    auto lastImageTime = start;
+
     while(imageCounter1 < maxImages && imageCounter2 < maxImages)
     {
         if (!cap1.read(frame1) || !cap2.read(frame2)) 
@@ -38,24 +39,25 @@ int main(int argc, char** argv)
         }
 
         // Display the videos
-        //cv::imshow("Live Video Stream 1", frame1);
-        //cv::imshow("Live Video Stream 2", frame2);
+        cv::imshow("Live Video Stream 1", frame1);
+        cv::imshow("Live Video Stream 2", frame2);
         
+        // Calculate the elapsed time
+        auto now = std::chrono::high_resolution_clock::now();
+        auto elapsedSinceLastImage = std::chrono::duration_cast<std::chrono::seconds>(now - lastImageTime).count();
+
         // Save frames every 3 seconds
-        if(frameCounter1 % 90 == 0) // Assuming 30 frames per second, adjust accordingly
+        if(elapsedSinceLastImage >= 3) 
         {
-            cv::imwrite(outputDirectory + "frame1_" + std::to_string(frameCounter1/30) + ".jpg", frame1);
+            cv::imwrite(outputDirectory + "frame1_" + std::to_string(imageCounter1) + ".jpg", frame1);
             imageCounter1++;
-        }
 
-        if(frameCounter2 % 90 == 0) // Assuming 30 frames per second, adjust accordingly
-        {
-            cv::imwrite(outputDirectory + "frame2_" + std::to_string(frameCounter2/30) + ".jpg", frame2);
+            cv::imwrite(outputDirectory + "frame2_" + std::to_string(imageCounter2) + ".jpg", frame2);
             imageCounter2++;
+
+            lastImageTime = now;
         }
 
-        frameCounter1++;
-        frameCounter2++;
         std::this_thread::sleep_for(std::chrono::milliseconds(33)); // sleep for ~33ms (30fps)
 
         // Break the loop if the user presses the 'q' key
@@ -65,7 +67,7 @@ int main(int argc, char** argv)
     }
 
     // Wait for 5 seconds before closing
-    //std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Destroy the windows after exiting the loop
     cv::destroyWindow("Live Video Stream 1");
@@ -73,3 +75,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
+
