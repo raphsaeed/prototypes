@@ -1,5 +1,5 @@
 //> g++ -o capture_images gstreamer_Camera_jetson_captureImages.cpp $(pkg-config --cflags --libs gstreamer-1.0)
-#include <gst/gst.h>
+#include <gst/gst.h>  
 
 int main(int argc, char *argv[]) {
   GstElement *pipeline;
