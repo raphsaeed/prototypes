@@ -1,0 +1,3 @@
+/Volumes/Projects/Projects/cpp/cpp_std/build_mac/CMakeFiles/main.dir
+/Volumes/Projects/Projects/cpp/cpp_std/build_mac/CMakeFiles/edit_cache.dir
+/Volumes/Projects/Projects/cpp/cpp_std/build_mac/CMakeFiles/rebuild_cache.dir
